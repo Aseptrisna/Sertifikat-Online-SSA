@@ -15,6 +15,28 @@ if (!fs.existsSync(outputPath)) {
     fs.mkdirSync(outputPath, { recursive: true });
 }
 
+function getLineCount(text, font, size, maxWidth) {
+    const words = text.split(' ');
+    let lineCount = 1;
+    let currentLine = '';
+
+    for (const word of words) {
+        // Coba tambahkan kata baru ke baris saat ini
+        const testLine = currentLine.length === 0 ? word : `${currentLine} ${word}`;
+        const testWidth = font.widthOfTextAtSize(testLine, size);
+
+        if (testWidth > maxWidth) {
+            // Jika melebihi, kata ini memulai baris baru
+            lineCount++;
+            currentLine = word;
+        } else {
+            // Jika muat, tambahkan ke baris saat ini
+            currentLine = testLine;
+        }
+    }
+    return lineCount;
+}
+
 function deletePdf(filePath) {
     if (!filePath) return;
     try {
@@ -61,20 +83,7 @@ async function generatePdf(data, existingGuid = null) {
 
     // --- JALUR 1: TIPE KOMPETENSI (BARU) ---
     if (data.certificateType === 'Kompetensi') {
-
-        // --- DATA DARI PDF ANALISIS ---
-        // data.name
-        // details.programName, data.issueDate
-        // data.certificateNumber
-        // details.totalScore
-        // details.predicate
-        // details.subjects
-        // ---------------------------------
-
-        // (SESUAIKAN SEMUA KOORDINAT X/Y/SIZE DI BAWAH INI)
-
-        // Gambar QR (Misal: pojok kiri bawah)
-        firstPage.drawImage(qrImage, { x: 750, y: 510, width: 80, height: 80 });
+        firstPage.drawImage(qrImage, { x: 647, y: 510, width: 80, height: 80 });
 
         // Gambar Nama (Rata tengah)
         const nameSize = 23;
@@ -101,13 +110,49 @@ async function generatePdf(data, existingGuid = null) {
         // firstPage.drawText("Certification ID:", { x: 50, y: 220, size: 10, font: fontBold });
         firstPage.drawText(data.certificateNumber, { x: 626, y: 432, size: 8, font: fontBold }); // 
 
-        let yPos = 255;
+        const nameSizes = 9;
+        const scoreSize = 10;
+        const nameMaxWidth = 200;
+        const rowPadding = 15; // Jarak vertikal antar materi
+
+        let yPos = 255; // Titik awal Y
         const subjects = details.subjects || [];
+
         if (subjects.length > 0) {
-            for (const subject of subjects) { // 
-                firstPage.drawText(subject.name, { x: 550, y: yPos, size: 9, font: font, maxWidth: 300 });
-                firstPage.drawText(subject.score, { x: 778, y: yPos, size: 10, font: fontBold });
-                yPos -= 20; // Beri jarak lebih untuk nama materi yang panjang
+            for (const subject of subjects) {
+                // 1. Dapatkan ketinggian baris untuk font
+                const nameLineHeight = font.heightAtSize(nameSizes);
+                const scoreLineHeight = fontBold.heightAtSize(scoreSize);
+
+                // 2. Hitung jumlah baris yang akan digunakan (menggunakan helper baru)
+                const numLines = getLineCount(subject.name, font, nameSizes, nameMaxWidth);
+
+                // 3. Hitung total ketinggian untuk teks materi
+                const entryTotalHeight = numLines * nameLineHeight;
+
+                // 4. Ambil mana yang lebih tinggi: tinggi teks materi ATAU tinggi 1 baris skor
+                const rowHeight = Math.max(entryTotalHeight, scoreLineHeight);
+
+                // 5. Gambar teks di yPos saat ini (ini adalah baseline)
+                // (drawText akan menangani wrapping otomatis)
+                firstPage.drawText(subject.name, { 
+                    x: 550, 
+                    y: yPos, // Baseline baris pertama
+                    size: nameSizes, 
+                    font: font, 
+                    maxWidth: nameMaxWidth,
+                    lineHeight: nameLineHeight // Beri tahu drawText cara wrap
+                });
+                
+                firstPage.drawText(subject.score, { 
+                    x: 778, 
+                    y: yPos, // Baseline yang sama
+                    size: scoreSize, 
+                    font: fontBold 
+                });
+
+                // 6. Kurangi yPos untuk entri berikutnya secara dinamis
+                yPos -= (rowHeight + rowPadding); 
             }
         }
 
@@ -196,7 +241,7 @@ async function generatePdf(data, existingGuid = null) {
             secondPage.drawText(`${index + 1}.`, { x: 200, y: yPos, size: 12, font: font });
             secondPage.drawText(item.name, { x: 250, y: yPos, size: 12, font: font });
             secondPage.drawText(item.score, { x: 650, y: yPos, size: 12, font: font });
-            yPos -= 20;
+            yPos -= 30;
         });
 
         // Pembimbing (Anda mengomentari ini, saya biarkan)

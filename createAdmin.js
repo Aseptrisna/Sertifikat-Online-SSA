@@ -10,7 +10,7 @@ const readline = require("readline");
 
 // --- KONFIGFIGURASI ---
 const MONGO_URI = process.env.MONGO_URI;
-const ADMIN_USERNAME = "admin"; // Ganti username jika perlu
+const ADMIN_USERNAME = "pt.lskk@gmail.com";
 // ---------------------
 
 // 1. Buat Skema User (harus sama dengan di server.js)
