@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Buat Sertifikat</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <style>
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="h-full">
+    <div class="flex min-h-full">
+        <div class="w-64 flex-shrink-0 bg-gray-800 text-white flex flex-col">
+            <div class="h-16 flex-shrink-0 flex items-center px-6 bg-gray-900">
+                <h1 class="text-xl font-bold">SSA Dashboard</h1>
+            </div>
+            <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+                <a href="/admin-create" class="flex items-center space-x-3 px-4 py-3 bg-gray-900 text-white rounded-lg font-medium">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>Buat Sertifikat</span>
+                </a>
+                <a href="/admin-manage" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg font-medium">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                    <span>Kelola Sertifikat</span>
+                </a>
+                <a href="/logout" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg font-medium">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </div>
+
+        <main class="flex-1 overflow-y-auto p-8 fade-in">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Buat Sertifikat Baru</h1>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Formulir Tunggal</h2>
+                    <form id="certForm" class="space-y-6">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-600 mb-1">Nama Lengkap</label>
+                                <input type="text" id="name" name="name" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200" required>
+                            </div>
+                            <div>
+                                <label for="certificateNumber" class="block text-sm font-medium text-gray-600 mb-1">Nomor Sertifikat</label>
+                                <input type="text" id="certificateNumber" name="certificateNumber" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             <div>
+                                <label for="issueDate" class="block text-sm font-medium text-gray-600 mb-1">Tanggal Terbit</label>
+                                <input type="text" id="issueDate" name="issueDate" placeholder="19 Oktober 2025" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200" required>
+                            </div>
+                            <div>
+                                <label for="certificateType" class="block text-sm font-medium text-gray-600 mb-1">Tipe Sertifikat</L>
+                                <select id="certificateType" name="certificateType" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200" required>
+                                    <option value="">-- Pilih Tipe --</option>
+                                    <option value="Kompetensi">Kompetensi</option>
+                                    <option value="PKL">PKL</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="dynamicConfigContainer">
+                            
+                            <div id="configKompetensi" class="config-type space-y-6 hidden">
+                                <hr class="my-4">
+                                <div>
+                                    <label for="kompetensiScore" class="block text-sm font-medium text-gray-600 mb-1">Score</label>
+                                    <input type="text" id="kompetensiScore" name="kompetensiScore" placeholder="A+" class="w-full md:w-1/3 border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-2">Daftar Materi</label>
+                                    <div id="subjectsContainer" class="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200 max-h-48 overflow-y-auto"></div>
+                                    <button type="button" id="addSubjectBtn" class="mt-3 inline-flex items-center space-x-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
+                                        <span>Tambah Materi</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="configPKL" class="config-type space-y-6 hidden">
+                                <hr class="my-4">
+                                <div>
+                                    <label for="pklInstitution" class="block text-sm font-medium text-gray-600 mb-1">Institusi (cth: SMK/Universitas)</label>
+                                    <input type="text" id="pklInstitution" name="pklInstitution" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                </div>
+                                <div>
+                                    <label for="pklActivityDescription" class="block text-sm font-medium text-gray-600 mb-1">Deskripsi Kegiatan</label>
+                                    <textarea id="pklActivityDescription" name="pklActivityDescription" rows="3" placeholder="Contoh: Pada Kegiatan Praktik Kerja Lapangan (PKL) yang diselenggarakan oleh..." class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"></textarea>
+                                </div>
+                                <div>
+                                    <label for="pklPembimbing" class="block text-sm font-medium text-gray-600 mb-1">Pembimbing Industri</label>
+                                    <input type="text" id="pklPembimbing" name="pklPembimbing" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-2">Nilai Keterampilan</label>
+                                    <div id="keterampilanContainer" class="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200 max-h-48 overflow-y-auto"></div>
+                                    <button type="button" id="addKeterampilanBtn" class="mt-3 inline-flex items-center ...">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
+                                        <span>Tambah Nilai Keterampilan</span>
+                                    </button>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-600 mb-2">Nilai Sikap</label>
+                                    <div id="sikapContainer" class="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200 max-h-48 overflow-y-auto"></div>
+                                    <button type="button" id="addSikapBtn" class="mt-3 inline-flex items-center ...">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
+                                        <span>Tambah Nilai Sikap</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4 pt-6 border-t border-gray-200">
+                            <button type="submit" id="certFormSubmitBtn" class="inline-flex items-center space-x-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all">
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
+                                <span>Buat Sertifikat</span>
+                            </button>
+                            <div id="formStatus" class="text-sm"></div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="lg:col-span-1 bg-white p-8 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Upload Batch</h2>
+                    <form id="excelForm" class="space-y-6">
+                        <div>
+                            <label for="excelFile" class="block text-sm font-medium text-gray-600 mb-1">File Excel (.xlsx)</label>
+                            <input type="file" id="excelFile" name="excelFile" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" accept=".xlsx" required>
+                            <p class="mt-2 text-xs text-gray-500">Pastikan kolom Excel sesuai: Tipe, Institusi, DeskripsiKegiatan, Pembimbing, NilaiKeterampilan (JSON), NilaiSikap (JSON), dll.</p>
+                        </div>
+                        <div class="flex items-center space-x-4 pt-6 border-t border-gray-200">
+                            <button type="submit" id="excelFormSubmitBtn" class="inline-flex items-center ...">
+                                <span>Upload Excel</span>
+                            </button>
+                            <div id="excelStatus" class="text-sm"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const certForm = document.getElementById('certForm');
+        const excelForm = document.getElementById('excelForm');
+        const formStatus = document.getElementById('formStatus');
+        const excelStatus = document.getElementById('excelStatus');
+        const certFormSubmitBtn = document.getElementById('certFormSubmitBtn');
+        const excelFormSubmitBtn = document.getElementById('excelFormSubmitBtn');
+        
+        // --- FORM DINAMIS ---
+        const certTypeSelect = document.getElementById('certificateType');
+        const configContainer = document.getElementById('dynamicConfigContainer');
+        const allConfigDivs = configContainer.querySelectorAll('.config-type');
+
+        certTypeSelect.addEventListener('change', () => {
+            const selectedType = certTypeSelect.value;
+            allConfigDivs.forEach(div => div.classList.add('hidden'));
+            const configToShow = document.getElementById(`config${selectedType}`);
+            if (configToShow) {
+                configToShow.classList.remove('hidden');
+            }
+        });
+
+        // --- HELPERS ---
+        function showStatus(element, message, isError = false) {
+            const icon = isError 
+                ? `<svg class="h-5 w-5 text-red-500" ...><path .../></svg>` // Ikon Error
+                : `<svg class="h-5 w-5 text-green-500" ...><path .../></svg>`; // Ikon Sukses
+            element.innerHTML = `<div class="flex items-center space-x-2 ${isError ? 'text-red-700' : 'text-green-700'}">${icon}<span>${message}</span></div>`;
+            setTimeout(() => { element.innerHTML = ''; }, 4000);
+        }
+
+        function createSubjectInput(containerId, name = '', score = '') {
+            const container = document.getElementById(containerId);
+            const row = document.createElement('div');
+            row.className = 'subject-row grid grid-cols-12 gap-2 items-center';
+            row.innerHTML = `
+                <div class="col-span-5"><input type="text" placeholder="Nama Materi" value="${name}" class="subject-name-input w-full border-gray-300 rounded-md shadow-sm text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" required></div>
+                <div class="col-span-5"><input type="text" placeholder="Nilai" value="${score}" class="subject-score-input w-full border-gray-300 rounded-md shadow-sm text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-200" required></div>
+                <div class="col-span-2 text-right"><button type="button" class="remove-subject-btn text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition-colors"><svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" /></svg></button></div>
+            `;
+            container.appendChild(row);
+            row.querySelector('.remove-subject-btn').addEventListener('click', () => row.remove());
+        }
+
+        function getSubjectsFromContainer(containerId) {
+            const subjects = [];
+            document.querySelectorAll(`#${containerId} .subject-row`).forEach(row => {
+                const subjectName = row.querySelector('.subject-name-input').value;
+                const score = row.querySelector('.subject-score-input').value;
+                if (subjectName && score) subjects.push({ name: subjectName, score: score }); // Diubah jadi name/score
+            });
+            return subjects;
+        }
+
+        // --- BUTTON LISTENERS ---
+        document.getElementById('addSubjectBtn').addEventListener('click', () => createSubjectInput('subjectsContainer'));
+        document.getElementById('addKeterampilanBtn').addEventListener('click', () => createSubjectInput('keterampilanContainer'));
+        document.getElementById('addSikapBtn').addEventListener('click', () => createSubjectInput('sikapContainer'));
+
+        // --- FORM SUBMIT HANDLERS ---
+        certForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            certFormSubmitBtn.disabled = true;
+            certFormSubmitBtn.textContent = 'Membuat...';
+            try {
+                const formData = new FormData(certForm);
+                const data = Object.fromEntries(formData.entries());
+                
+                // === LOGIKA BARU: Buat 'details' object ===
+                data.details = {};
+                if (data.certificateType === 'Kompetensi') {
+                    data.details.overallScore = data.kompetensiScore;
+                    data.details.subjects = getSubjectsFromContainer('subjectsContainer');
+                    delete data.kompetensiScore;
+                } else if (data.certificateType === 'PKL') {
+                    data.details.institution = data.pklInstitution;
+                    data.details.activityDescription = data.pklActivityDescription;
+                    data.details.pembimbing = data.pklPembimbing;
+                    data.details.nilaiKeterampilan = getSubjectsFromContainer('keterampilanContainer');
+                    data.details.nilaiSikap = getSubjectsFromContainer('sikapContainer');
+                    
+                    delete data.pklInstitution;
+                    delete data.pklActivityDescription;
+                    delete data.pklPembimbing;
+                }
+
+                const response = await fetch('/admin/create-form', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+                
+                showStatus(formStatus, result.message, false);
+                certForm.reset();
+                document.getElementById('subjectsContainer').innerHTML = '';
+                document.getElementById('keterampilanContainer').innerHTML = '';
+                document.getElementById('sikapContainer').innerHTML = '';
+                allConfigDivs.forEach(div => div.classList.add('hidden'));
+            } catch (err) {
+                showStatus(formStatus, err.message, true);
+            } finally {
+                certFormSubmitBtn.disabled = false;
+                certFormSubmitBtn.innerHTML = `... <span>Buat Sertifikat</span>`; // (Icon + Teks)
+            }
+        });
+
+        excelForm.addEventListener('submit', async (e) => {
+            // ... (Logika submit Excel tidak berubah)
+            e.preventDefault();
+            excelFormSubmitBtn.disabled = true;
+            excelFormSubmitBtn.textContent = 'Mengupload...';
+            const formData = new FormData(excelForm);
+            try {
+                const response = await fetch('/admin/upload-excel', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+                showStatus(excelStatus, result.message, false);
+                excelForm.reset();
+            } catch (err) {
+                showStatus(excelStatus, err.message, true);
+            } finally {
+                excelFormSubmitBtn.disabled = false;
+                excelFormSubmitBtn.innerHTML = `... <span>Upload Excel</span>`;
+            }
+        });
+    </script>
+</body>
+</html>

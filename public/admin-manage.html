@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Kelola Sertifikat</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <style>
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-open { overflow: hidden; }
+    </style>
+</head>
+<body class="h-full">
+    <div class="flex min-h-full">
+        <div class="w-64 flex-shrink-0 bg-gray-800 text-white flex flex-col">
+            <div class="h-16 flex-shrink-0 flex items-center px-6 bg-gray-900">
+                <h1 class="text-xl font-bold">SSA Dashboard</h1>
+            </div>
+            <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+                <a href="/admin-create" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg font-medium">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>Buat Sertifikat</span>
+                </a>
+                <a href="/admin-manage" class="flex items-center space-x-3 px-4 py-3 bg-gray-900 text-white rounded-lg font-medium">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                    <span>Kelola Sertifikat</span>
+                </a>
+                <a href="/logout" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg font-medium">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </div>
+
+        <main class="flex-1 overflow-y-auto p-8 fade-in">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Kelola Sertifikat</h1>
+
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" /></svg>
+                        </div>
+                        <input type="text" id="searchInput" placeholder="Cari berdasarkan nama..." class="w-full md:w-1/2 block pl-10 border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                    </div>
+                </div>
+
+                <div id="manageStatus" class="px-6 py-4 text-sm"></div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Peserta</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Sertifikat</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminCertList" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="paginationContainer" class="flex justify-between items-center px-6 py-4 border-t border-gray-200">
+                    <span id="pageInfo" class="text-sm text-gray-600"></span>
+                    <div class="space-x-2">
+                        <button id="prevPageBtn" class="inline-flex items-center ... text-sm" disabled>
+                            <svg class="h-4 w-4" ...><path ... /></svg>
+                            <span>Sebelumnya</span>
+                        </button>
+                        <button id="nextPageBtn" class="inline-flex items-center ... text-sm" disabled>
+                            <span>Selanjutnya</span>
+                            <svg class="h-4 w-4" ...><path ... /></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 fade-in">
+        <div class="relative top-10 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200">
+                <h3 class="text-2xl font-bold text-gray-800">Edit Sertifikat</h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 text-3xl font-bold">&times;</button>
+            </div>
+            
+            <form id="editForm" class="space-y-6 max-h-[70vh] overflow-y-auto p-2">
+                <input type="hidden" id="editCertId" name="editCertId">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="editName" class="block text-sm font-medium text-gray-600 mb-1">Nama Lengkap</label>
+                        <input type="text" id="editName" name="name" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200" required>
+                    </div>
+                    <div>
+                        <label for="editCertNumber" class="block text-sm font-medium text-gray-600 mb-1">Nomor Sertifikat</label>
+                        <input type="text" id="editCertNumber" name="certificateNumber" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="editIssueDate" class="block text-sm font-medium text-gray-600 mb-1">Tanggal</label>
+                        <input type="text" id="editIssueDate" name="issueDate" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200" required>
+                    </div>
+                    <div>
+                        <label for="editCertType" class="block text-sm font-medium text-gray-600 mb-1">Tipe Sertifikat</label>
+                        <select id="editCertType" name="certificateType" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200" required>
+                            <option value="Kompetensi">Kompetensi</option>
+                            <option value="PKL">PKL</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="editDynamicConfigContainer">
+                    
+                    <div id="editConfigKompetensi" class="edit-config-type space-y-6 hidden">
+                        <hr class="my-4">
+                        <div>
+                            <label for="editKompetensiScore" class="block text-sm font-medium text-gray-600 mb-1">Score</label>
+                            <input type="text" id="editKompetensiScore" name="kompetensiScore" class="w-full md:w-1/3 border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-2">Daftar Materi</label>
+                            <div id="editSubjectsContainer" class="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200 max-h-48 overflow-y-auto"></div>
+                            <button type="button" id="editAddSubjectBtn" class="mt-3 inline-flex items-center ...">
+                                <span>Tambah Materi</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="editConfigPKL" class="edit-config-type space-y-6 hidden">
+                        <hr class="my-4">
+                        <div>
+                            <label for="editPklInstitution" class="block text-sm font-medium text-gray-600 mb-1">Institusi</label>
+                            <input type="text" id="editPklInstitution" name="pklInstitution" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                        </div>
+                        <div>
+                            <label for="editPklActivityDescription" class="block text-sm font-medium text-gray-600 mb-1">Deskripsi Kegiatan</label>
+                            <textarea id="editPklActivityDescription" name="pklActivityDescription" rows="3" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"></textarea>
+                        </div>
+                        <div>
+                            <label for="editPklPembimbing" class="block text-sm font-medium text-gray-600 mb-1">Pembimbing Industri</label>
+                            <input type="text" id="editPklPembimbing" name="pklPembimbing" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-2">Nilai Keterampilan</label>
+                            <div id="editKeterampilanContainer" class="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200 max-h-48 overflow-y-auto"></div>
+                            <button type="button" id="editAddKeterampilanBtn" class="mt-3 inline-flex items-center ...">
+                                <span>Tambah Nilai Keterampilan</span>
+                            </button>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-2">Nilai Sikap</label>
+                            <div id="editSikapContainer" class="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200 max-h-48 overflow-y-auto"></div>
+                            <button type="button" id="editAddSikapBtn" class="mt-3 inline-flex items-center ...">
+                                <span>Tambah Nilai Sikap</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4 pt-6 border-t border-gray-200">
+                    <button type="submit" id="editFormSubmitBtn" class="inline-flex items-center ...">
+                        <span>Simpan Perubahan</span>
+                    </button>
+                    <div id="editStatus" class="text-sm"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- Referensi Elemen ---
+        const adminCertList = document.getElementById('adminCertList');
+        const manageStatus = document.getElementById('manageStatus');
+        const searchInput = document.getElementById('searchInput');
+        const pageInfo = document.getElementById('pageInfo');
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+
+        // Modal Elements
+        const editModal = document.getElementById('editModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const editForm = document.getElementById('editForm');
+        const editFormSubmitBtn = document.getElementById('editFormSubmitBtn');
+        const editStatus = document.getElementById('editStatus');
+        const editCertTypeSelect = document.getElementById('editCertType');
+        const allEditConfigDivs = document.querySelectorAll('.edit-config-type');
+
+        // State
+        let allCertificatesData = [];
+        let currentPage = 1;
+        let currentSearch = '';
+        let totalPages = 1;
+        const LIMIT = 10;
+
+        // --- Helper: Tampilkan Status ---
+        function showStatus(element, message, isError = false) {
+            const icon = isError ? `... (icon error)` : `... (icon success)`;
+            element.innerHTML = `<div class="flex items-center ...">${icon}<span>${message}</span></div>`;
+            setTimeout(() => { element.innerHTML = ''; }, 4000);
+        }
+
+        // --- Helper: Input Materi Dinamis ---
+        function createSubjectInput(containerId, name = '', score = '') {
+            const container = document.getElementById(containerId);
+            const row = document.createElement('div');
+            row.className = 'subject-row grid grid-cols-12 gap-2 items-center';
+            row.innerHTML = `
+                <div class="col-span-5"><input type="text" placeholder="Nama Materi" value="${name}" class="subject-name-input ..."></div>
+                <div class="col-span-5"><input type="text" placeholder="Nilai" value="${score}" class="subject-score-input ..."></div>
+                <div class="col-span-2 text-right"><button type="button" class="remove-subject-btn ..."><svg ...>...</svg></button></div>
+            `;
+            container.appendChild(row);
+            row.querySelector('.remove-subject-btn').addEventListener('click', () => row.remove());
+        }
+
+        function getSubjectsFromContainer(containerId) {
+            const subjects = [];
+            document.querySelectorAll(`#${containerId} .subject-row`).forEach(row => {
+                const subjectName = row.querySelector('.subject-name-input').value;
+                const score = row.querySelector('.subject-score-input').value;
+                if (subjectName && score) subjects.push({ name: subjectName, score: score });
+            });
+            return subjects;
+        }
+        
+        // --- Helper: Tombol Tambah di Modal ---
+        document.getElementById('editAddSubjectBtn').addEventListener('click', () => createSubjectInput('editSubjectsContainer'));
+        document.getElementById('editAddKeterampilanBtn').addEventListener('click', () => createSubjectInput('editKeterampilanContainer'));
+        document.getElementById('editAddSikapBtn').addEventListener('click', () => createSubjectInput('editSikapContainer'));
+
+        // --- Fungsi Inti: Muat & Render Table ---
+        async function loadAndRenderCertificates(page = 1, search = '') {
+            // ... (Logika tidak berubah dari sebelumnya)
+            currentPage = page; currentSearch = search;
+            manageStatus.innerHTML = '<span class="text-gray-500">Memuat data...</span>';
+            adminCertList.innerHTML = '';
+            try {
+                const response = await fetch(`/admin/certificates?page=${page}&limit=${LIMIT}&search=${search}`);
+                if (!response.ok) throw new Error('Gagal memuat data');
+                const data = await response.json();
+                allCertificatesData = data.certificates; totalPages = data.totalPages;
+                if (allCertificatesData.length === 0) {
+                    adminCertList.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada data ditemukan.</td></tr>`;
+                } else {
+                    allCertificatesData.forEach(cert => {
+                        const row = document.createElement('tr');
+                        row.className = "hover:bg-gray-50";
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-medium text-gray-900">${cert.name}</div></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-600">${cert.certificateNumber}</div></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs ... ${cert.certificateType === 'Kompetensi' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">${cert.certificateType}</span></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${cert.issueDate}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                                <button class="editBtn text-blue-600 hover:text-blue-900" data-id="${cert._id}">Edit</button>
+                                <button class="deleteBtn text-red-600 hover:text-red-900" data-id="${cert._id}">Hapus</button>
+                            </td>
+                        `;
+                        adminCertList.appendChild(row);
+                    });
+                }
+                pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages} (Total ${data.totalCount} data)`;
+                prevPageBtn.disabled = (currentPage <= 1);
+                nextPageBtn.disabled = (currentPage >= totalPages);
+                manageStatus.innerHTML = '';
+            } catch (err) { showStatus(manageStatus, err.message, true); }
+        }
+
+        // --- Event Listeners (Search, Pagination, Delete) ---
+        let searchTimeout;
+        searchInput.addEventListener('keyup', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => { loadAndRenderCertificates(1, searchInput.value); }, 500);
+        });
+        prevPageBtn.addEventListener('click', () => { if (currentPage > 1) loadAndRenderCertificates(currentPage - 1, currentSearch); });
+        nextPageBtn.addEventListener('click', () => { if (currentPage < totalPages) loadAndRenderCertificates(currentPage + 1, currentSearch); });
+        adminCertList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('deleteBtn')) handleDelete(e.target.dataset.id);
+            if (e.target.classList.contains('editBtn')) openEditModal(e.target.dataset.id);
+        });
+        async function handleDelete(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus sertifikat ini?')) return;
+            try {
+                const response = await fetch(`/admin/delete/${id}`, { method: 'DELETE' });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+                showStatus(manageStatus, result.message, false);
+                loadAndRenderCertificates(currentPage, currentSearch); 
+            } catch (err) { showStatus(manageStatus, err.message, true); }
+        }
+
+        // --- Logika Modal Edit (BARU) ---
+        function openEditModal(id) {
+            const cert = allCertificatesData.find(c => c._id === id); 
+            if (!cert) return;
+
+            // 1. Isi Bidang Umum
+            document.getElementById('editCertId').value = cert._id;
+            document.getElementById('editName').value = cert.name;
+            document.getElementById('editCertNumber').value = cert.certificateNumber;
+            document.getElementById('editIssueDate').value = cert.issueDate;
+            document.getElementById('editCertType').value = cert.certificateType;
+
+            // 2. Sembunyikan semua config & Kosongkan container
+            allEditConfigDivs.forEach(div => div.classList.add('hidden'));
+            document.getElementById('editSubjectsContainer').innerHTML = '';
+            document.getElementById('editKeterampilanContainer').innerHTML = '';
+            document.getElementById('editSikapContainer').innerHTML = '';
+            
+            // 3. Tampilkan & Isi config yang benar
+            const details = cert.details || {};
+            if (cert.certificateType === 'Kompetensi') {
+                document.getElementById('editKompetensiScore').value = details.overallScore || '';
+                if (details.subjects && details.subjects.length > 0) {
+                    details.subjects.forEach(sub => createSubjectInput('editSubjectsContainer', sub.name, sub.score));
+                }
+                document.getElementById('editConfigKompetensi').classList.remove('hidden');
+            } else if (cert.certificateType === 'PKL') {
+                document.getElementById('editPklInstitution').value = details.institution || '';
+                document.getElementById('editPklActivityDescription').value = details.activityDescription || '';
+                document.getElementById('editPklPembimbing').value = details.pembimbing || '';
+                if (details.nilaiKeterampilan && details.nilaiKeterampilan.length > 0) {
+                    details.nilaiKeterampilan.forEach(sub => createSubjectInput('editKeterampilanContainer', sub.name, sub.score));
+                }
+                if (details.nilaiSikap && details.nilaiSikap.length > 0) {
+                    details.nilaiSikap.forEach(sub => createSubjectInput('editSikapContainer', sub.name, sub.score));
+                }
+                document.getElementById('editConfigPKL').classList.remove('hidden');
+            }
+
+            editModal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
+        }
+
+        // Tampilkan config dinamis saat Tipe di Modal diganti
+        editCertTypeSelect.addEventListener('change', () => {
+            const selectedType = editCertTypeSelect.value;
+            allEditConfigDivs.forEach(div => div.classList.add('hidden'));
+            const configToShow = document.getElementById(`editConfig${selectedType}`);
+            if (configToShow) configToShow.classList.remove('hidden');
+        });
+
+        function closeEditModal() {
+            editModal.classList.add('hidden');
+            document.body.classList.remove('modal-open');
+            editStatus.innerHTML = '';
+        }
+        closeModalBtn.addEventListener('click', closeEditModal);
+
+        // Submit Form Edit (BARU)
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            editFormSubmitBtn.disabled = true;
+            editFormSubmitBtn.textContent = 'Menyimpan...';
+
+            const id = document.getElementById('editCertId').value;
+            const formData = new FormData(editForm);
+            const data = Object.fromEntries(formData.entries());
+            
+            // === LOGIKA BARU: Buat 'details' object ===
+            data.details = {};
+            if (data.certificateType === 'Kompetensi') {
+                data.details.overallScore = data.kompetensiScore;
+                data.details.subjects = getSubjectsFromContainer('editSubjectsContainer');
+            } else if (data.certificateType === 'PKL') {
+                data.details.institution = data.pklInstitution;
+                data.details.activityDescription = data.pklActivityDescription;
+                data.details.pembimbing = data.pklPembimbing;
+                data.details.nilaiKeterampilan = getSubjectsFromContainer('editKeterampilanContainer');
+                data.details.nilaiSikap = getSubjectsFromContainer('editSikapContainer');
+            }
+            // Hapus data duplikat dari root
+            delete data.editCertId;
+            delete data.kompetensiScore;
+            delete data.pklInstitution;
+            delete data.pklActivityDescription;
+            delete data.pklPembimbing;
+
+            try {
+                const response = await fetch(`/admin/edit/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+                
+                showStatus(editStatus, result.message, false);
+                setTimeout(() => {
+                    closeEditModal();
+                    loadAndRenderCertificates(currentPage, currentSearch); 
+                }, 1500);
+            } catch (err) {
+                showStatus(editStatus, err.message, true);
+            } finally {
+                editFormSubmitBtn.disabled = false;
+                editFormSubmitBtn.innerHTML = `... <span>Simpan Perubahan</span>`; // (Icon + Teks)
+            }
+        });
+        
+        loadAndRenderCertificates(1, '');
+    </script>
+</body>
+</html>

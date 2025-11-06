@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Smart System Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Animasi sederhana untuk modal dan status */
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .fade-out {
+            animation: fadeOut 0.3s ease-in forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95); }
+        }
+        /* Menyembunyikan scrollbar saat modal aktif */
+        .modal-open {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 antialiased">
+
+    <nav class="bg-white shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-6 py-4">
+            <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+            <p class="text-gray-600">Smart System Academy</p>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2 space-y-8">
+            
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">Buat Sertifikat Tunggal</h2>
+                <form id="certForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap:</label>
+                            <input type="text" id="name" name="name" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="certificateNumber" class="block text-sm font-medium text-gray-700 mb-1">Nomor Sertifikat:</label>
+                            <input type="text" id="certificateNumber" name="certificateNumber" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="issueDate" class="block text-sm font-medium text-gray-700 mb-1">Tanggal (cth: 19 Oktober 2025):</label>
+                            <input type="text" id="issueDate" name="issueDate" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="overallScore" class="block text-sm font-medium text-gray-700 mb-1">Score (cth: A+):</label>
+                            <input type="text" id="overallScore" name="overallScore" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="certificateType" class="block text-sm font-medium text-gray-700 mb-1">Tipe Sertifikat:</label>
+                            <select id="certificateType" name="certificateType" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                                <option value="">-- Pilih Tipe --</option>
+                                <option value="Kompetensi">Kompetensi</option>
+                                <option value="PKL">PKL</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Daftar Materi:</label>
+                        <div id="subjectsContainer" class="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            </div>
+                        <button type="button" id="addSubjectBtn" class="mt-3 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                            + Tambah Materi
+                        </button>
+                    </div>
+
+                    <div class="flex items-center space-x-4 pt-4 border-t border-gray-200">
+                        <button type="submit" id="certFormSubmitBtn" class="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all">
+                            Buat Sertifikat
+                        </button>
+                        <div id="formStatus" class="text-sm"></div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">Upload Batch via Excel</h2>
+                <form id="excelForm" class="space-y-4">
+                    <div>
+                        <label for="excelFile" class="block text-sm font-medium text-gray-700 mb-1">Pilih File (.xlsx):</label>
+                        <input type="file" id="excelFile" name="excelFile" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" accept=".xlsx" required>
+                    </div>
+                    <div class="flex items-center space-x-4 pt-4 border-t border-gray-200">
+                        <button type="submit" id="excelFormSubmitBtn" class="bg-green-600 text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all">
+                            Upload Excel
+                        </button>
+                        <div id="excelStatus" class="text-sm"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1">
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg sticky top-24">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Kelola Sertifikat</h2>
+                <button id="loadCertsBtn" class="w-full bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold mb-4 hover:bg-gray-900 transition-colors">
+                    Muat Daftar Sertifikat
+                </button>
+                <div id="manageStatus" class="text-sm mb-4"></div>
+                <div id="adminCertList" class="space-y-3 max-h-[60vh] overflow-y-auto divide-y divide-gray-100">
+                    </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 fade-in">
+        <div class="relative top-10 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200">
+                <h3 class="text-2xl font-bold text-gray-800">Edit Sertifikat</h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 text-3xl font-bold">&times;</button>
+            </div>
+            
+            <form id="editForm" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                <input type="hidden" id="editCertId" name="editCertId">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="editName" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap:</label>
+                        <input type="text" id="editName" name="name" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="editCertNumber" class="block text-sm font-medium text-gray-700 mb-1">Nomor Sertifikat:</label>
+                        <input type="text" id="editCertNumber" name="certificateNumber" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="editIssueDate" class="block text-sm font-medium text-gray-700 mb-1">Tanggal:</label>
+                        <input type="text" id="editIssueDate" name="issueDate" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="editOverallScore" class="block text-sm font-medium text-gray-700 mb-1">Score:</label>
+                        <input type="text" id="editOverallScore" name="overallScore" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="editCertType" class="block text-sm font-medium text-gray-700 mb-1">Tipe Sertifikat:</label>
+                        <select id="editCertType" name="certificateType" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                            <option value="Kompetensi">Kompetensi</option>
+                            <option value="PKL">PKL</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Daftar Materi:</label>
+                    <div id="editSubjectsContainer" class="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        </div>
+                    <button type="button" id="editAddSubjectBtn" class="mt-3 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                        + Tambah Materi
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-4 pt-4 border-t border-gray-200">
+                    <button type="submit" id="editFormSubmitBtn" class="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all">
+                        Simpan Perubahan
+                    </button>
+                    <div id="editStatus" class="text-sm"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        // --- Referensi Elemen ---
+        const certForm = document.getElementById('certForm');
+        const excelForm = document.getElementById('excelForm');
+        const loadCertsBtn = document.getElementById('loadCertsBtn');
+        const adminCertList = document.getElementById('adminCertList');
+        
+        const formStatus = document.getElementById('formStatus');
+        const excelStatus = document.getElementById('excelStatus');
+        const manageStatus = document.getElementById('manageStatus');
+
+        const certFormSubmitBtn = document.getElementById('certFormSubmitBtn');
+        const excelFormSubmitBtn = document.getElementById('excelFormSubmitBtn');
+
+        // Modal Elements
+        const editModal = document.getElementById('editModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const editForm = document.getElementById('editForm');
+        const editFormSubmitBtn = document.getElementById('editFormSubmitBtn');
+        const editStatus = document.getElementById('editStatus');
+
+        let allCertificatesData = []; // Cache
+
+        // --- Helper: Fungsi untuk Menampilkan Status ---
+        function showStatus(element, message, isError = false) {
+            element.textContent = message;
+            element.className = isError ? 'text-sm text-red-600' : 'text-sm text-green-600';
+            setTimeout(() => { element.textContent = ''; }, 4000);
+        }
+
+        // --- Helper: Fungsi untuk Input Materi Dinamis ---
+        function createSubjectInput(containerId, name = '', score = '') {
+            const container = document.getElementById(containerId);
+            const row = document.createElement('div');
+            row.className = 'subject-row grid grid-cols-12 gap-2 items-center';
+            row.innerHTML = `
+                <div class="col-span-5">
+                    <input type="text" placeholder="Nama Materi" value="${name}" class="subject-name-input w-full border-gray-300 rounded-md shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+                <div class="col-span-5">
+                    <input type="text" placeholder="Nilai" value="${score}" class="subject-score-input w-full border-gray-300 rounded-md shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+                <div class="col-span-2">
+                    <button type="button" class="remove-subject-btn text-red-500 hover:text-red-700 font-medium text-sm">Hapus</button>
+                </div>
+            `;
+            container.appendChild(row);
+            
+            // Tambah event listener untuk tombol hapus
+            row.querySelector('.remove-subject-btn').addEventListener('click', () => {
+                row.remove();
+            });
+            return row;
+        }
+
+        // --- Helper: Fungsi untuk Mengambil Data Materi dari Container ---
+        function getSubjectsFromContainer(containerId) {
+            const subjects = [];
+            const subjectRows = document.querySelectorAll(`#${containerId} .subject-row`);
+            
+            subjectRows.forEach(row => {
+                const subjectName = row.querySelector('.subject-name-input').value;
+                const score = row.querySelector('.subject-score-input').value;
+                if (subjectName && score) {
+                    subjects.push({ subjectName, score });
+                }
+            });
+            return subjects;
+        }
+
+        // --- Logika Input Materi (Form Utama) ---
+        document.getElementById('addSubjectBtn').addEventListener('click', () => {
+            createSubjectInput('subjectsContainer');
+        });
+
+        // --- Logika Input Materi (Modal Edit) ---
+        document.getElementById('editAddSubjectBtn').addEventListener('click', () => {
+            createSubjectInput('editSubjectsContainer');
+        });
+
+
+        // --- Handler: Submit Form Tunggal ---
+        certForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            certFormSubmitBtn.disabled = true;
+            certFormSubmitBtn.textContent = 'Membuat...';
+            
+            try {
+                // Ambil data form dasar
+                const formData = new FormData(certForm);
+                const data = Object.fromEntries(formData.entries());
+                
+                // Ambil data materi dinamis
+                data.subjects = getSubjectsFromContainer('subjectsContainer');
+                
+                const response = await fetch('/admin/create-form', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+
+                showStatus(formStatus, result.message, false);
+                certForm.reset();
+                document.getElementById('subjectsContainer').innerHTML = ''; // Kosongkan materi
+                loadAndRenderCertificates(); // Muat ulang daftar
+            } catch (err) {
+                showStatus(formStatus, err.message, true);
+            } finally {
+                certFormSubmitBtn.disabled = false;
+                certFormSubmitBtn.textContent = 'Buat Sertifikat';
+            }
+        });
+
+        // --- Handler: Submit Form Excel ---
+        excelForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            excelFormSubmitBtn.disabled = true;
+            excelFormSubmitBtn.textContent = 'Mengupload...';
+            
+            const formData = new FormData(excelForm);
+            
+            try {
+                const response = await fetch('/admin/upload-excel', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+
+                showStatus(excelStatus, result.message, false);
+                excelForm.reset();
+                loadAndRenderCertificates(); // Muat ulang daftar
+            } catch (err) {
+                showStatus(excelStatus, err.message, true);
+            } finally {
+                excelFormSubmitBtn.disabled = false;
+                excelFormSubmitBtn.textContent = 'Upload Excel';
+            }
+        });
+
+
+        // --- Handler: Kelola Sertifikat (Muat, Edit, Hapus) ---
+
+        // Fungsi Muat & Render Daftar
+        async function loadAndRenderCertificates() {
+            loadCertsBtn.disabled = true;
+            manageStatus.textContent = 'Memuat...';
+            manageStatus.className = 'text-sm text-gray-500';
+
+            try {
+                const response = await fetch('/all-certificates');
+                if (!response.ok) throw new Error('Gagal memuat data');
+                allCertificatesData = await response.json();
+
+                adminCertList.innerHTML = '';
+                if (allCertificatesData.length === 0) {
+                    adminCertList.innerHTML = '<p class="text-gray-500 text-sm">Tidak ada data.</p>';
+                    return;
+                }
+
+                allCertificatesData.forEach(cert => {
+                    const certElement = document.createElement('div');
+                    certElement.className = 'flex justify-between items-center py-3';
+                    certElement.innerHTML = `
+                        <div class="min-w-0">
+                            <p class="font-medium text-gray-800 truncate">${cert.name}</p>
+                            <p class="text-sm text-gray-600">${cert.certificateNumber}</p>
+                        </div>
+                        <div class="space-x-2 flex-shrink-0 ml-4">
+                            <button class="editBtn text-sm text-blue-600 font-medium hover:underline" data-id="${cert._id}">Edit</button>
+                            <button class="deleteBtn text-sm text-red-600 font-medium hover:underline" data-id="${cert._id}">Hapus</button>
+                        </div>
+                    `;
+                    adminCertList.appendChild(certElement);
+                });
+                manageStatus.textContent = '';
+            } catch (err) {
+                showStatus(manageStatus, err.message, true);
+            } finally {
+                loadCertsBtn.disabled = false;
+            }
+        }
+
+        loadCertsBtn.addEventListener('click', loadAndRenderCertificates);
+
+        // Delegasi Event untuk Hapus dan Edit
+        adminCertList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('deleteBtn')) {
+                handleDelete(e.target.dataset.id);
+            }
+            if (e.target.classList.contains('editBtn')) {
+                openEditModal(e.target.dataset.id);
+            }
+        });
+
+        // Fungsi Hapus
+        async function handleDelete(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus sertifikat ini? Aksi ini tidak bisa dibatalkan.')) {
+                return;
+            }
+            try {
+                const response = await fetch(`/admin/delete/${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+                
+                showStatus(manageStatus, result.message, false);
+                loadAndRenderCertificates(); // Muat ulang daftar
+            } catch (err) {
+                showStatus(manageStatus, err.message, true);
+            }
+        }
+
+        // --- Logika Modal Edit ---
+
+        // Fungsi Buka Modal
+        function openEditModal(id) {
+            const cert = allCertificatesData.find(c => c._id === id);
+            if (!cert) return;
+
+            // Isi form modal dengan data
+            document.getElementById('editCertId').value = cert._id;
+            document.getElementById('editName').value = cert.name;
+            document.getElementById('editCertNumber').value = cert.certificateNumber;
+            document.getElementById('editIssueDate').value = cert.issueDate;
+            document.getElementById('editOverallScore').value = cert.overallScore;
+            document.getElementById('editCertType').value = cert.certificateType;
+
+            // Kosongkan dan Isi materi dinamis
+            const editContainer = document.getElementById('editSubjectsContainer');
+            editContainer.innerHTML = '';
+            if (cert.subjects && cert.subjects.length > 0) {
+                cert.subjects.forEach(sub => {
+                    createSubjectInput('editSubjectsContainer', sub.subjectName, sub.score);
+                });
+            }
+
+            // Tampilkan modal
+            editModal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
+        }
+
+        // Fungsi Tutup Modal
+        function closeEditModal() {
+            editModal.classList.add('hidden');
+            document.body.classList.remove('modal-open');
+            editStatus.textContent = ''; // Bersihkan status
+        }
+        closeModalBtn.addEventListener('click', closeEditModal);
+
+        // Handler Submit Form Edit
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            editFormSubmitBtn.disabled = true;
+            editFormSubmitBtn.textContent = 'Menyimpan...';
+
+            const id = document.getElementById('editCertId').value;
+            const formData = new FormData(editForm);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Ambil data materi dinamis dari modal
+            data.subjects = getSubjectsFromContainer('editSubjectsContainer');
+            delete data.editCertId; // Hapus ID dari body
+
+            try {
+                const response = await fetch(`/admin/edit/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+
+                showStatus(editStatus, result.message, false);
+                setTimeout(() => {
+                    closeEditModal();
+                    loadAndRenderCertificates();
+                }, 1500);
+
+            } catch (err) {
+                showStatus(editStatus, err.message, true);
+            } finally {
+                editFormSubmitBtn.disabled = false;
+                editFormSubmitBtn.textContent = 'Simpan Perubahan';
+            }
+        });
+        
+        // Muat data saat halaman pertama kali dibuka
+        loadAndRenderCertificates();
+
+    </script>
+</body>
+</html>

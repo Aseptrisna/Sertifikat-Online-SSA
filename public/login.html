@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login - SSA Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+</head>
+<body class="h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8">
+        <div>
+            <h1 class="text-center text-3xl font-bold tracking-tight text-gray-900">
+                SSA Dashboard
+            </h1>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Silakan login ke akun admin Anda
+            </p>
+        </div>
+
+        <form class="mt-8 space-y-6" action="/login" method="POST">
+            <div class="rounded-md shadow-sm -space-y-px">
+                <div>
+                    <label for="username" class="sr-only">Username</label>
+                    <input id="username" name="username" type="text" required
+                        class="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                        placeholder="Username">
+                </div>
+                <div>
+                    <label for="password" class="sr-only">Password</label>
+                    <input id="password" name="password" type="password" required
+                        class="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                        placeholder="Password">
+                </div>
+            </div>
+
+            <div id="errorMessage" class="text-sm text-red-600"></div>
+
+            <div>
+                <button type="submit"
+                    class="group relative flex w-full justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Login
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Cek jika ada query param ?error=1
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('error')) {
+            document.getElementById('errorMessage').textContent = 'Username atau password salah. Silakan coba lagi.';
+        }
+    </script>
+</body>
+</html>
