@@ -5,157 +5,222 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifikasi Sertifikat</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
     
-    <div id="loading" class="text-center">
-        <p>Memverifikasi...</p>
+    <style>
+        /* Animasi fade-in dan pop-up untuk kartu */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Kelas untuk menerapkan animasi */
+        .animate-fade-in-scale {
+            animation: fadeInScale 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Spinner kustom */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            /* Ganti warna ini (indigo-600) agar sesuai dengan tema Anda jika perlu */
+            border-left-color: #4f46e5; 
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
+    
+    <div id="loading" class="flex flex-col items-center justify-center space-y-4">
+        <div class="spinner" role="status"></div>
+        <p class="text-lg font-medium text-indigo-700">Memverifikasi Sertifikat...</p>
     </div>
 
-    <div id="certificateCard" class="hidden w-full max-w-2xl bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
-        <div class="flex items-center space-x-4 mb-6 pb-6 border-b">
-            <div id="iconContainer" class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg">
+    <div id="certificateCard" class="hidden w-full max-w-3xl bg-white p-6 sm:p-8 rounded-2xl shadow-2xl border border-gray-200/50">
+        
+        <div class="flex items-start sm:items-center space-x-4 mb-6 pb-6 border-b border-gray-200">
+            <div id="iconContainer" class="flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center shadow-lg">
                 </div>
             <div>
-                <h1 id="statusTitle" class="text-2xl font-bold text-gray-900"></h1>
-                <p class="text-sm text-gray-600">Smart System Academy</p>
+                <h1 id="statusTitle" class="text-2xl sm:text-3xl font-bold text-gray-900">
+                    </h1>
+                <p class="text-base text-gray-600">Smart System Academy</p>
             </div>
         </div>
         
-        <div id="detailsContainer" class="space-y-3">
+        <div id="detailsContainer" class="space-y-6">
             </div>
         
-        <div id="downloadButtonContainer" class="text-center mt-8">
-            <a id="downloadLink" href="#" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition">
-                Unduh PDF
+        <div id="downloadButtonContainer" class="text-center mt-8 pt-8 border-t border-gray-200">
+            <a id="downloadLink" href="#" class="inline-flex items-center justify-center space-x-2 bg-indigo-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm6.293-9.707a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 10.414V15a1 1 0 11-2 0v-4.586L6.707 12.707a1 1 0 01-1.414-1.414l3-3z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v4.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 111.414-1.414L9 8.586V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                <span>Unduh PDF</span>
             </a>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const guid = window.location.pathname.split('/').pop();
+            // Referensi Elemen
             const loadingEl = document.getElementById('loading');
             const cardEl = document.getElementById('certificateCard');
             const iconContainer = document.getElementById('iconContainer');
             const statusTitle = document.getElementById('statusTitle');
             const detailsContainer = document.getElementById('detailsContainer');
             const downloadButtonContainer = document.getElementById('downloadButtonContainer');
-            
+            const downloadLink = document.getElementById('downloadLink');
+
+            // --- DEKLARASI IKON ---
             const validIcon = `<div class="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center shadow-lg"><svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>`;
             const invalidIcon = `<div class="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg"><svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg></div>`;
 
-            // Helper untuk membuat baris tabel
-            function createListItems(list, title) { // 'title' tidak terpakai, tapi tidak masalah
+            // --- HELPER FUNCTION BARU ---
+
+            /**
+             * Membuat satu baris detail yang responsif (stack di mobile, side-by-side di desktop).
+             * @param {string} label - Judul (misal: "Nama Peserta")
+             * @param {string} value - Nilai (misal: "Budi Santoso")
+             */
+            function createDetailRow(label, value) {
+                if (!value) value = '<span class="text-gray-400">N/A</span>';
+                return `
+                    <div class="py-3 sm:flex sm:items-center sm:justify-between sm:gap-4">
+                        <dt class="text-sm font-medium text-gray-500">${label}</dt>
+                        <dd class="mt-1 text-base font-semibold text-gray-900 sm:mt-0 sm:text-right">${value}</dd>
+                    </div>
+                `;
+            }
+
+            /**
+             * Membuat daftar item skor yang telah diperbarui.
+             */
+            function createListItems(list) {
                 if (!list || list.length === 0) {
-                    return '<li class="text-gray-500">Tidak ada data.</li>';
+                    return '<li class="text-gray-500">Tidak ada data skor.</li>';
                 }
                 return list.map(item => 
-                    `<li class="text-gray-800 flex justify-between">
-                        <span>- ${item.name}</span>
-                        <span class="font-medium">${item.score}</span>
+                    `<li class="flex items-center justify-between text-sm py-1">
+                        <span class="text-gray-700">${item.name}</span>
+                        <span class="font-bold text-indigo-600 text-base">${item.score}</span>
                     </li>`
                 ).join('');
             }
 
+            // --- LOGIKA UTAMA ---
             try {
+                const guid = window.location.pathname.split('/').pop();
+                if (!guid) throw new Error('GUID tidak valid atau tidak ditemukan di URL.');
+
                 const response = await fetch(`/api/certificate/${guid}`);
-                if (!response.ok) throw new Error('Sertifikat tidak ditemukan.');
+                if (!response.ok) {
+                    if (response.status === 404) throw new Error('Sertifikat tidak ditemukan.');
+                    throw new Error('Gagal mengambil data sertifikat.');
+                }
                 const data = await response.json();
 
+                // 1. Atur Status Sukses
                 iconContainer.innerHTML = validIcon;
                 statusTitle.textContent = 'Sertifikat Terverifikasi';
                 
-                // 1. Render Info Umum
-                let html = `
-                    <div class="grid grid-cols-3 gap-2">
-                        <span class="font-medium text-gray-600">Nama Peserta:</span>
-                        <span class="col-span-2 text-gray-900 font-semibold">${data.name}</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <span class="font-medium text-gray-600">Nomor Sertifikat:</span>
-                        <span class="col-span-2 text-gray-800">${data.certificateNumber}</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <span class="font-medium text-gray-600">Tanggal Terbit:</span>
-                        <span class="col-span-2 text-gray-800">${data.issueDate}</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <span class="font-medium text-gray-600">Tipe Sertifikat:</span>
-                        <span class="col-span-2 text-gray-800">${data.certificateType}</span>
-                    </div>
-                `;
+                // 2. Render Info Umum (Gaya Baru)
+                let generalInfoHtml = '<dl class="divide-y divide-gray-200">';
+                generalInfoHtml += createDetailRow('Nama Peserta', data.name);
+                generalInfoHtml += createDetailRow('Nomor Sertifikat', data.certificateNumber);
+                generalInfoHtml += createDetailRow('Tanggal Terbit', data.issueDate);
+                generalInfoHtml += createDetailRow('Tipe Sertifikat', data.certificateType);
+                generalInfoHtml += '</dl>';
                 
-                // 2. Render Info Spesifik dari 'details'
+                let specificInfoHtml = '';
                 const details = data.details || {};
                 
-                // ===== PERUBAHAN DI SINI =====
+                // 3. Render Info Spesifik (Tipe Sertifikat)
                 if (data.certificateType === 'Kompetensi') {
-                    html += `
-                        <div class="grid grid-cols-3 gap-2">
-                            <span class="font-medium text-gray-600">Nama Program:</span>
-                            <span class="col-span-2 text-gray-800">${details.programName || 'N/A'}</span>
+                    specificInfoHtml = `
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium text-gray-900">Detail Kompetensi</h3>
+                            <dl class="mt-2 divide-y divide-gray-200 border-t border-b">
+                                ${createDetailRow('Nama Program', details.programName)}
+                                ${createDetailRow('Total Score', `<span class="text-indigo-600">${details.totalScore || 'N/A'}</span>`)}
+                                ${createDetailRow('Predicate', `<span class="text-indigo-600">${details.predicate || 'N/A'}</span>`)}
+                            </dl>
                         </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <span class="font-medium text-gray-600">Total Score:</span>
-                            <span class="col-span-2 text-gray-800 font-bold">${details.totalScore || 'N/A'}</span>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <span class="font-medium text-gray-600">Predicate:</span>
-                            <span class="col-span-2 text-gray-800">${details.predicate || 'N/A'}</span>
-                        </div>
-                        <div class="pt-4 mt-4 border-t">
-                            <h3 class="font-medium text-gray-600 mb-2">Score Report:</h3>
-                            <ul class="space-y-1 pl-2">${createListItems(details.subjects)}</ul>
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Score Report</h3>
+                            <div class="rounded-lg border bg-gray-50 p-4">
+                                <ul class="space-y-1 divide-y divide-gray-200">${createListItems(details.subjects)}</ul>
+                            </div>
                         </div>
                     `;
-                // ===== AKHIR PERUBAHAN =====
-
                 } else if (data.certificateType === 'PKL') {
-                    // Blok PKL ini tidak berubah
-                    html += `
-                        <div class="grid grid-cols-3 gap-2">
-                            <span class="font-medium text-gray-600">Institusi:</span>
-                            <span class="col-span-2 text-gray-800">${details.institution || 'N/A'}</span>
+                    specificInfoHtml = `
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium text-gray-900">Detail PKL</h3>
+                            <dl class="mt-2 divide-y divide-gray-200 border-t border-b">
+                                ${createDetailRow('Institusi', details.institution)}
+                                ${createDetailRow('Kegiatan', details.activityDescription)}
+                                ${createDetailRow('Pembimbing', details.pembimbing)}
+                            </dl>
                         </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <span class="font-medium text-gray-600">Kegiatan:</span>
-                            <span class="col-span-2 text-gray-800">${details.activityDescription || 'N/A'}</span>
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Nilai Keterampilan</h3>
+                            <div class="rounded-lg border bg-gray-50 p-4">
+                                <ul class="space-y-1 divide-y divide-gray-200">${createListItems(details.nilaiKeterampilan)}</ul>
+                            </div>
                         </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <span class="font-medium text-gray-600">Pembimbing:</span>
-                            <span class="col-span-2 text-gray-800">${details.pembimbing || 'N/A'}</span>
-                        </div>
-                        <div class="pt-4 mt-4 border-t">
-                            <h3 class="font-medium text-gray-600 mb-2">Nilai Keterampilan:</h3>
-                            <ul class="space-y-1 pl-2">${createListItems(details.nilaiKeterampilan)}</ul>
-                        </div>
-                        <div class="pt-4 mt-4 border-t">
-                            <h3 class="font-medium text-gray-600 mb-2">Nilai Sikap:</h3>
-                            <ul class="space-y-1 pl-2">${createListItems(details.nilaiSikap)}</ul>
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Nilai Sikap</h3>
+                            <div class="rounded-lg border bg-gray-50 p-4">
+                                <ul class="space-y-1 divide-y divide-gray-200">${createListItems(details.nilaiSikap)}</ul>
+                            </div>
                         </div>
                     `;
                 }
                 
-                // 3. Render GUID
-                html += `
-                    <div class="grid grid-cols-3 gap-2 pt-4 mt-4 border-t">
-                        <span class="font-medium text-gray-600">GUID:</span>
-                        <span class="col-span-2 text-gray-500 text-xs break-all">${data.guid}</span>
+                // 4. Render GUID (Gaya Baru)
+                let guidHtml = `
+                    <div class="mt-6">
+                        <dl class="border-t border-gray-200">
+                            ${createDetailRow('GUID', `<span class="text-xs text-gray-500 break-all">${data.guid}</span>`)}
+                        </dl>
                     </div>
                 `;
 
-                detailsContainer.innerHTML = html;
-                document.getElementById('downloadLink').href = data.filePath;
+                // 5. Gabungkan semua HTML dan masukkan ke kontainer
+                detailsContainer.innerHTML = generalInfoHtml + specificInfoHtml + guidHtml;
+                
+                // 6. Atur link unduh
+                downloadLink.href = data.filePath;
 
             } catch (error) {
+                // Tangani Error
                 iconContainer.innerHTML = invalidIcon;
                 statusTitle.textContent = 'Verifikasi Gagal';
-                detailsContainer.innerHTML = `<p class="text-red-600 font-medium">${error.message}</p>`;
+                detailsContainer.innerHTML = `
+                    <div class="rounded-lg bg-red-50 p-6 text-center">
+                        <p class="font-medium text-red-800">${error.message}</p>
+                        <p class="text-sm text-red-700 mt-2">Pastikan link yang Anda gunakan benar atau hubungi administrator.</p>
+                    </div>
+                `;
                 downloadButtonContainer.style.display = 'none';
             } finally {
+                // 7. Tampilkan Kartu dengan Animasi
                 loadingEl.style.display = 'none';
                 cardEl.classList.remove('hidden');
+                cardEl.classList.add('animate-fade-in-scale');
             }
         });
     </script>
