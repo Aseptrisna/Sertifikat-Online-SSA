@@ -72,7 +72,7 @@ async function generatePdf(data, existingGuid = null) {
 
     // 2. Generate GUID & QR Data
     const guid = existingGuid || `SERTIFIKAT-${uuidv4().toUpperCase()}-${new Date().getFullYear()}`;
-    const qrUrl = `https://sertifikat-ssa.lskk.id/detail/${guid}`;
+    const qrUrl = `https://sertifikat-ssa.lskk.co.id/detail/${guid}`;
     const qrDataURL = await qrcode.toDataURL(qrUrl, { errorCorrectionLevel: 'H' });
     const qrImage = await pdfDoc.embedPng(qrDataURL);
 
