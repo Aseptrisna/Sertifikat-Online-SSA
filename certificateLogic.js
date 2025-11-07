@@ -83,7 +83,7 @@ async function generatePdf(data, existingGuid = null) {
 
     // --- JALUR 1: TIPE KOMPETENSI (BARU) ---
     if (data.certificateType === 'Kompetensi') {
-        firstPage.drawImage(qrImage, { x: 647, y: 510, width: 80, height: 80 });
+        firstPage.drawImage(qrImage, { x: 350, y: 445, width: 60, height: 60 });
 
         // Gambar Nama (Rata tengah)
         const nameSize = 23;
